@@ -1,0 +1,24 @@
+version: "3.3"
+
+services:
+  web:
+    build: .
+    command: poetry run python run.py
+    volumes:
+      - .:/code
+    expose:
+      - "5000"
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER="${POSTGRES_USER}"
+      - POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:

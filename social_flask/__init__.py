@@ -18,8 +18,3 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 Migrate(app,db, compare_type=True)
-
-from social_flask.models import User
-@app.route('/')
-def hello_world():
-    return '<h1>salvee</h1>'

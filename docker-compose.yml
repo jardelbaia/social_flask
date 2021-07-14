@@ -1,24 +1,27 @@
 version: "3.3"
 
 services:
+  db:
+    image: postgres:13
+    env_file:
+      - ./.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - main
   web:
     build: .
+    restart: always
     command: poetry run python run.py
     volumes:
       - .:/code
-    expose:
-      - "5000"
     ports:
       - 5000:5000
     depends_on:
       - db
-  db:
-    image: postgres:13
-    environment:
-      - POSTGRES_USER="${POSTGRES_USER}"
-      - POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-
+    networks:
+      - main
 volumes:
   postgres_data:
+networks:
+  main:

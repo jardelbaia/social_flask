@@ -1,5 +1,6 @@
 from social_flask import db
+from social_flask import models
 
-
-db.create_all()
-db.session.commit()
+def create_db():
+    db.create_all()
+    db.session.commit()

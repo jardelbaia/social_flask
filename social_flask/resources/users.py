@@ -74,7 +74,6 @@ class Login(Resource):
         except ValueError:
             return {'error': 'Incorrect password'}
         except:
-            #exceção para 404 aqui
             return {'error': 'User not found'}
 
         response = user_schema.dump(user)

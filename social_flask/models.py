@@ -1,6 +1,6 @@
 from sqlalchemy import ForeignKey
 
-from social_flask import db
+from social_flask import db, bcrypt
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -9,16 +9,19 @@ class User(db.Model):
     email = db.Column(db.String(80), nullable=False)
     password = db.Column(db.String(1500))
     name = db.Column(db.String(100), nullable=False)
-
+    created_on = db.Column(db.DateTime)
+    
     def __init__(
         self,
         email: str,
         password: str,
-        name: str
+        name: str,
+        created_on
     ) -> None:
         self.email = email
-        self.password = password
+        self.password = bcrypt.generate_password_hash(password).decode('utf8')
         self.name = name
+        self.created_on = created_on
 
     def is_authenticated(self):
         return True

@@ -12,9 +12,11 @@ services:
   web:
     build: .
     restart: always
-    command: poetry run python run.py
+    command: bash entrypoint.sh
     volumes:
       - .:/code
+    expose:
+      - '5000'
     ports:
       - 5000:5000
     depends_on:

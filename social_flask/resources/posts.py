@@ -5,20 +5,25 @@ from flask_jwt_extended import (
     jwt_required,
     current_user
 )
+from sqlalchemy import desc
 from marshmallow import ValidationError, validate
 
 from social_flask import db
 from social_flask.schemas.posts import (
-    post_schema
+    post_schema,
+    posts_schema
 )
 from social_flask.models import Post
 
 
 class Posts(Resource):
 
-    #all posts ordered by date created
-    # @jwt_required()
-    # def get(self):
+
+    def get(self):
+        posts = Post.query.order_by(desc(Post.created_on)).all()
+
+        return posts_schema.dump(posts)
+
 
     @jwt_required()
     def post(self):

@@ -2,30 +2,25 @@ import datetime as dt
 from flask import request, jsonify
 from flask_restful import Resource
 from flask_jwt_extended import (
-    create_access_token
+    create_access_token,
+    jwt_required,
+    current_user
 )
 from marshmallow import ValidationError, validate
 
 
-from social_flask import bcrypt, db
+from social_flask import bcrypt, db, jwt
 from social_flask.models import User
 from social_flask.helpers import authenticate
-from social_flask.schemas import (
+from social_flask.schemas.users import (
     user_schema,
     users_schema,
     login_schema
 )
 
+
+
 class Register(Resource):
-    #rota para retornar todos os usuários
-    def get(self):
-        try:
-            users = User.query.all()
-        except:
-            return {'erro': 'deu ruim'}
-
-        return users_schema.dump(users) 
-
 
     def post(self):
         register_input = request.get_json()
@@ -35,6 +30,9 @@ class Register(Resource):
             email = data['email']
             name = data['name']
             password = data['password']
+            short_bio = None 
+            if 'short_bio' in data:
+                short_bio = data['short_bio']
         except ValidationError as err:
             return {'errors': err.messages}
 
@@ -47,6 +45,7 @@ class Register(Resource):
                 email = email,
                 name = name,
                 password = password,
+                short_bio = short_bio,
                 created_on = dt.datetime.now()
             )
             db.session.add(new_user)
@@ -78,6 +77,12 @@ class Login(Resource):
 
         response = user_schema.dump(user)
         response['msg'] = 'User logged in!'
-        response['token'] = create_access_token(identity=email)
+        response['token'] = create_access_token(identity=user)
 
         return response
+
+class Profile(Resource):
+
+    @jwt_required()
+    def get(self):
+        return user_schema.dump(current_user)

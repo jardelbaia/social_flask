@@ -17,9 +17,10 @@ class UserSchema(Schema):
         load_only=True
     )
     name = fields.Str(
-        required=True,
-        load_only=True
+        required=True
     )
+    short_bio = fields.Str()
+    
     created_on = fields.DateTime(dump_only=True)
 
     @post_dump(pass_many=True)

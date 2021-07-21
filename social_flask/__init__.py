@@ -12,7 +12,7 @@ load_dotenv()
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = \
                                 'postgresql://{}:{}@db:5432/{}'\
                                 .format(

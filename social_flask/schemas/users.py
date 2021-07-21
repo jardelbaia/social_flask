@@ -19,7 +19,9 @@ class UserSchema(Schema):
     name = fields.Str(
         required=True
     )
-    short_bio = fields.Str()
+    short_bio = fields.Str(
+        validate=[validate.Length(max=250)]
+    )
     
     created_on = fields.DateTime(dump_only=True)
 

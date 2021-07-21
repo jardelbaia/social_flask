@@ -80,9 +80,3 @@ class Login(Resource):
         response['token'] = create_access_token(identity=user)
 
         return response
-
-class Profile(Resource):
-
-    @jwt_required()
-    def get(self):
-        return user_schema.dump(current_user)

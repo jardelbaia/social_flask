@@ -9,7 +9,6 @@ from marshmallow import ValidationError, validate
 from social_flask.schemas.users import user_schema
 
 
-
 class Profile(Resource):
 
     @jwt_required()

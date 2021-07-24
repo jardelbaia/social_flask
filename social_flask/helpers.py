@@ -4,8 +4,8 @@ from social_flask.models import (
     PostLikes
 )
 
-def authenticate(email, password):
-    user = User.query.filter_by(email = email).first_or_404()
+def authenticate(email: str, password: str) -> User:
+    user: User = User.query.filter_by(email = email).first_or_404()
     
     if bcrypt.check_password_hash(user.password, password):
         return user
@@ -14,7 +14,7 @@ def authenticate(email, password):
 
 
 @jwt.user_identity_loader
-def user_identity_lookup(user):
+def user_identity_lookup(user: User) -> int:
     return user.id
 
 
@@ -24,7 +24,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
     return User.query.filter_by(id=identity).one_or_none()
 
 
-def has_liked(user_id, post_id):
+def has_liked(user_id: int, post_id: int) -> bool:
     return PostLikes.query.filter(
             PostLikes.user_id == user_id,
             PostLikes.post_id == post_id

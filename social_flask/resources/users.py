@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     current_user
 )
 from marshmallow import ValidationError, validate
-
+from typing import Dict
 
 from social_flask import bcrypt, db, jwt
 from social_flask.models import User
@@ -19,25 +19,24 @@ from social_flask.schemas.users import (
 )
 
 
-
 class Register(Resource):
 
-    def post(self):
+    def post(self) -> Dict:
         register_input = request.get_json()
 
         try:
-            data = user_schema.load(register_input)
-            email = data['email']
-            name = data['name']
-            password = data['password']
+            data: Dict = user_schema.load(register_input)
+            email: str = data['email']
+            name: str = data['name']
+            password: str = data['password']
             short_bio = None 
             if 'short_bio' in data:
-                short_bio = data['short_bio']
+                short_bio: str = data['short_bio']
         except ValidationError as err:
             return {'errors': err.messages}
 
         try:
-            user = User.query.filter_by(email = email).first_or_404()
+            user: User = User.query.filter_by(email = email).first_or_404()
             
             return {'error': 'user already registered'}
         except:
@@ -51,32 +50,39 @@ class Register(Resource):
             db.session.add(new_user)
             db.session.commit()
 
-        data = user_schema.dump(new_user)
+        data: Dict = user_schema.dump(new_user)
         data['msg'] = 'User created! Please login'
 
         return data
 
 class Login(Resource):
 
-    def post(self):
+    def post(self) -> Dict:
         login_input = request.get_json()
 
         try:
-            data = login_schema.load(login_input)
+            data: Dict = login_schema.load(login_input)
             email = data['email']
             password = data['password']
         except ValidationError as err:
             return {'errors': err.messages}
         
         try:
-            user = authenticate(email, password)
+            user: User = authenticate(email, password)
         except ValueError:
             return {'error': 'Incorrect password'}
         except:
             return {'error': 'User not found'}
 
-        response = user_schema.dump(user)
+        response: Dict = user_schema.dump(user)
         response['msg'] = 'User logged in!'
         response['token'] = create_access_token(identity=user)
 
         return response
+
+
+class Profile(Resource):
+
+    @jwt_required()
+    def get(self) -> Dict:
+        return user_schema.dump(current_user)

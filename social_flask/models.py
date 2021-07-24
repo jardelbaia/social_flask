@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -13,7 +14,10 @@ class User(db.Model):
     short_bio = db.Column(db.String(250))
     created_on = db.Column(db.DateTime)
     
-    posts = relationship('Post', backref='owner')
+    posts = relationship(
+        'Post', 
+        backref='owner'
+    )
     liked_posts = relationship(
         'PostLikes',
         backref='user'
@@ -24,8 +28,8 @@ class User(db.Model):
         email: str,
         password: str,
         name: str,
-        created_on,
-        short_bio: str = None
+        created_on: datetime,
+        short_bio = None
     ) -> None:
         self.email = email
         self.password = bcrypt.generate_password_hash(password).decode('utf8')
@@ -53,7 +57,7 @@ class Post(db.Model):
         title: str,
         text: str,
         owner_id: int,
-        created_on
+        created_on: datetime
     ) -> None:
         self.title = title
         self.text = text

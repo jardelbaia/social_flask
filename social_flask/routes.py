@@ -1,9 +1,7 @@
 from social_flask import api
 from social_flask.resources.users import (
     Register,
-    Login
-)
-from social_flask.resources.profile import (
+    Login,
     Profile
 )
 from social_flask.resources.posts import (

@@ -11,7 +11,6 @@ class LikeSchema(Schema):
     user_id = fields.Int(dump_only=True)
     post_id = fields.Int(required=True)
 
-
     @post_dump(pass_many=True)
     def wrap(self, data, many):
         key = 'likes' if many else 'like'

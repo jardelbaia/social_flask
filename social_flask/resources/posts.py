@@ -12,8 +12,7 @@ from social_flask import db
 from social_flask.helpers import has_liked
 from social_flask.schemas.posts import (
     post_schema,
-    posts_schema,
-    like_schema
+    posts_schema
 )
 from social_flask.models import (
     Post,
@@ -54,20 +53,46 @@ class Posts(Resource):
         return data
 
 
+class SinglePost(Resource):
+
+    def get(self, post_id):
+        
+        try:
+            post_to_view = Post.query.filter_by(id = post_id).first_or_404()
+        except:
+            return {'error': 'Post not find'}
+
+        return post_schema.dump(post_to_view)
+    
+    @jwt_required()
+    def delete(self, post_id):
+
+        try:
+            post_to_delete = Post.query.filter_by(id = post_id).first_or_404()
+        except:
+            return {'error': 'Post not find'}
+        
+        if post_to_delete.owner_id != current_user.id:
+            return {'error': 'Unauthorized'}
+
+        PostLikes.query.filter_by(post_id = post_id).delete()
+        Post.query.filter_by(id = post_id).delete()
+        db.session.commit()
+
+        return {'msg': 'Post deleted!'}
+
+
 class LikePost(Resource):
 
     @jwt_required()
-    def post(self):
-        like_input = request.get_json()
-
+    def post(self, post_id):
+        print(post_id, type(post_id))
         try:
-            data = like_schema.load(like_input)
-            user_id = current_user.id
-            post_id = data['post_id']
-        except ValidationError as err:
-            return {'errors': err.messages}
+            Post.query.filter_by(id = post_id).first_or_404()
+        except:
+            return {'error': 'Post not find'}
 
-        data = {}
+        user_id = current_user.id
 
         if not has_liked(user_id, post_id):
             new_like = PostLikes(
@@ -77,14 +102,13 @@ class LikePost(Resource):
             db.session.add(new_like)
             db.session.commit()
 
-            data = like_schema.dump(new_like)
-            data['msg'] = 'Post liked!'
+            msg = 'Post liked!'
         else:
             PostLikes.query.filter_by(
                 user_id = user_id,
                 post_id = post_id
             ).delete()
             db.session.commit()
-            data['msg'] = 'Post unliked'
+            msg = 'Post unliked'
 
-        return data
+        return {'msg': msg}
